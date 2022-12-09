@@ -2,6 +2,8 @@ package com.malli.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import java.util.List;
+
 import javax.persistence.*;
 
 @Entity
@@ -27,6 +29,9 @@ public class DAOUser extends BaseEntity {
 	@ManyToOne
     @JoinColumn(name = "customer_id")
 	private Customer customer;
+	
+	@Transient
+	private String newPassword;
 	
 	public long getId() {
 		return id;
@@ -58,5 +63,13 @@ public class DAOUser extends BaseEntity {
 
 	public void setCustomer(Customer customer) {
 		this.customer = customer;
+	}
+
+	public String getNewPassword() {
+		return newPassword;
+	}
+
+	public void setNewPassword(String newPassword) {
+		this.newPassword = newPassword;
 	}
 }
