@@ -24,6 +24,10 @@ public class DAOUser extends BaseEntity {
 	@JsonIgnore
 	private String password;
 	
+	@ManyToOne
+    @JoinColumn(name = "customer_id")
+	private Customer customer;
+	
 	public long getId() {
 		return id;
 	}
@@ -48,4 +52,11 @@ public class DAOUser extends BaseEntity {
 		this.password = password;
 	}
 
+	public Customer getCustomer() {
+		return customer;
+	}
+
+	public void setCustomer(Customer customer) {
+		this.customer = customer;
+	}
 }
