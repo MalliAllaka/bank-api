@@ -10,7 +10,10 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
@@ -38,6 +41,8 @@ public class Customer extends BaseEntity {
     @Column(name = "account_type")
    	private String accountType;
     
+	@Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(pattern="dd-MM-yyyy HH:mm:ss")
     @Column(name = "open_date")
    	private Date openDate;
     

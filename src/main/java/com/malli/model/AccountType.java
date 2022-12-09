@@ -21,7 +21,7 @@ public class AccountType extends BaseEntity {
 	private long id;
 	
 	@Column(name = "acc_type")
-	private String acc_type;
+	private String accType;
 	
 	@Column(name = "min_balance")
 	private Double minBalance;
@@ -34,12 +34,12 @@ public class AccountType extends BaseEntity {
 		this.id = id;
 	}
 
-	public String getAcc_type() {
-		return acc_type;
+	public String getAccType() {
+		return accType;
 	}
 
-	public void setAcc_type(String acc_type) {
-		this.acc_type = acc_type;
+	public void setAccType(String accType) {
+		this.accType = accType;
 	}
 
 	public Double getMinBalance() {
