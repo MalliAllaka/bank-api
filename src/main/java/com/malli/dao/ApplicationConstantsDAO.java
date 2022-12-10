@@ -12,5 +12,8 @@ import com.malli.model.ApplicationConstants;
 public interface ApplicationConstantsDAO extends JpaRepository<ApplicationConstants, Long> {
 	
 	Optional<ApplicationConstants> findById(Long id);
+
+	ApplicationConstants findByKey(String key);
+	
 	
 }

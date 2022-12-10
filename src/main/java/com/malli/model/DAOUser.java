@@ -2,13 +2,14 @@ package com.malli.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import java.io.Serializable;
 import java.util.List;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "users")
-public class DAOUser extends BaseEntity {
+public class DAOUser extends BaseEntity  implements Serializable {
 
 	/**
 	 * 
@@ -32,6 +33,9 @@ public class DAOUser extends BaseEntity {
 	
 	@Transient
 	private String newPassword;
+	
+	@Column(name = "userType")
+	private String userType = "CUSTOMER";	
 	
 	public long getId() {
 		return id;
@@ -71,5 +75,13 @@ public class DAOUser extends BaseEntity {
 
 	public void setNewPassword(String newPassword) {
 		this.newPassword = newPassword;
+	}
+
+	public String getUserType() {
+		return userType;
+	}
+
+	public void setUserType(String userType) {
+		this.userType = userType;
 	}
 }

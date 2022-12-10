@@ -38,8 +38,9 @@ public class Customer extends BaseEntity {
     @Column(name = "balance")
 	private Double balance;
     
-    @Column(name = "account_type")
-   	private String accountType;
+    @ManyToOne
+    @JoinColumn(name = "account_type")
+	private AccountType accountType;
     
 	@Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern="dd-MM-yyyy HH:mm:ss")
@@ -82,11 +83,11 @@ public class Customer extends BaseEntity {
 		this.balance = balance;
 	}
 
-	public String getAccountType() {
+	public AccountType getAccountType() {
 		return accountType;
 	}
 
-	public void setAccountType(String accountType) {
+	public void setAccountType(AccountType accountType) {
 		this.accountType = accountType;
 	}
 
