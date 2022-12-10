@@ -8,7 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "account_types")
+@Table(name = "application_constants")
 public class ApplicationConstants extends BaseEntity {
 
 	/**
@@ -20,10 +20,10 @@ public class ApplicationConstants extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 	
-	@Column(name = "key")
+	@Column(name = "`key`")
 	private String key;
 	
-	@Column(name = "value")
+	@Column(name = "`value`")
 	private String value;
 
 	public long getId() {

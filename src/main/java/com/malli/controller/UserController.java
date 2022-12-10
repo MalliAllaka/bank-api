@@ -48,5 +48,16 @@ public class UserController extends CommonController{
 			throw new Exception("failed", e);
 		}
 	}
+	
+	@RequestMapping(value = "/findByUsername", method = RequestMethod.GET)
+	public DAOUser findByUsername(@RequestParam String username)  throws Exception{
+		DAOUser user = null;
+		try {
+			user = usersService.getUserDetailsByUsername(username);
+		} catch (Exception e) {
+			throw new Exception("failed", e);
+		}
+		return user;
+	}
 
 }
