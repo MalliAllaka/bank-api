@@ -24,10 +24,10 @@ public class Transactions extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 	
-	@Column(name = "date")
+	@Column(name = "`date`")
 	private Date date;
 	
-	@Column(name = "type")
+	@Column(name = "`type`")
 	private String type;
 	
 	@Column(name = "method")
@@ -40,7 +40,7 @@ public class Transactions extends BaseEntity {
 	@Column(name = "amount")
 	private Double amount;
 	
-	@Column(name = "from")
+	@Column(name = "`from`")
 	private String from;
 	
 	@Column(name = "remark")

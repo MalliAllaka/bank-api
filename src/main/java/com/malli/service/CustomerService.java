@@ -27,5 +27,16 @@ public class CustomerService {
 			throw e;
 		}
 		return customerList;
+	}
+
+	public List<Customer> searchCustomers(String searchText, Pageable pageable) {
+		List<Customer> customerList = new ArrayList<Customer>();
+		try {
+			customerList = customerDAO.searchCustomers(searchText,pageable);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
+		return customerList;
 	} 
 }
