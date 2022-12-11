@@ -1,6 +1,7 @@
 package com.malli.service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -9,7 +10,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.malli.common.SecurityContextUtils;
+import com.malli.dao.CustomerDAO;
 import com.malli.dao.TransactionsDAO;
+import com.malli.model.Customer;
 import com.malli.model.Transactions;
 
 @Service
@@ -17,6 +21,9 @@ public class TransactionsService {
 
 	@Autowired
 	private TransactionsDAO transactionsDAO;
+	
+	@Autowired
+	private CustomerDAO customerDAO;
 	
 	public Transactions getTransactions(Long id) throws Exception {
 		Optional<Transactions> transactions = transactionsDAO.findById(id);
@@ -36,5 +43,26 @@ public class TransactionsService {
 			throw new Exception("failed at findAll");
 		}
 		return transactionList;
+	}
+
+	public Transactions withdrawAmount(Transactions transactions) throws Exception {
+		try {
+			Optional<Customer> customerOpt = customerDAO.findById(transactions.getCustomer().getId());
+			Customer customer = customerOpt.get();
+			if(customer.getBalance() >= transactions.getAmount()) {
+				String userName = SecurityContextUtils.getUserId();
+				transactions.setDate(new Date());
+				transactions.setFrom(userName);
+				transactions = transactionsDAO.save(transactions);
+				customer.setBalance(customer.getBalance() - transactions.getAmount());
+				customerDAO.save(customer);
+				return transactions;
+			} else {
+				throw new Exception("low Balance");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
 	}
 }
