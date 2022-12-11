@@ -2,6 +2,7 @@ package com.malli.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.malli.dao.CustomerDAO;
 import com.malli.model.Customer;
+import com.malli.model.Transactions;
 
 @Service
 public class CustomerService {
@@ -38,5 +40,13 @@ public class CustomerService {
 			throw e;
 		}
 		return customerList;
+	}
+
+	public Customer searchCustomer(Long id) throws Exception {
+		Optional<Customer> customerOpt = customerDAO.findById(id);
+		if (!customerOpt.isPresent()) {
+			throw new Exception("Customer not found for id : " + id);
+		}
+		return customerOpt.get();
 	} 
 }

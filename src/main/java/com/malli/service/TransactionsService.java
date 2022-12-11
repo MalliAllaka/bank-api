@@ -55,7 +55,8 @@ public class TransactionsService {
 				transactions.setFrom(userName);
 				transactions = transactionsDAO.save(transactions);
 				customer.setBalance(customer.getBalance() - transactions.getAmount());
-				customerDAO.save(customer);
+				customer = customerDAO.save(customer);
+				transactions.setCustomer(customer);
 				return transactions;
 			} else {
 				throw new Exception("low Balance");
@@ -64,5 +65,32 @@ public class TransactionsService {
 			e.printStackTrace();
 			throw e;
 		}
+	}
+
+	public Transactions depositeAmount(Transactions transactions) throws Exception {
+		try {
+			Optional<Customer> customerOpt = customerDAO.findById(transactions.getCustomer().getId());
+			Customer customer = customerOpt.get();
+			transactions.setDate(new Date());
+			transactions = transactionsDAO.save(transactions);
+			customer.setBalance(customer.getBalance() + transactions.getAmount());
+			customer = customerDAO.save(customer);
+			transactions.setCustomer(customer);
+			return transactions;
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
+	}
+
+	public List<Transactions> findbyCustomerId(Long customerId, Pageable pageable) throws Exception {
+		List<Transactions> transactionList =new ArrayList<Transactions>();
+		try {
+			transactionList = transactionsDAO.findbyCustomerId(customerId,pageable);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new Exception("failed at findAll");
+		}
+		return transactionList;
 	}
 }
