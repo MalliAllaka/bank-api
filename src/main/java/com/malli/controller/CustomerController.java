@@ -55,6 +55,18 @@ public class CustomerController extends CommonController{
 
 	}
 	
+
+	@RequestMapping(value = "/searchCustomer", method = RequestMethod.GET)
+	public Customer searchCustomer(@RequestParam Long id)  throws Exception{
+		Customer customer = new Customer();
+		try {
+			customer = customerService.searchCustomer(id);
+		} catch (Exception e) {
+			throw new Exception("failed", e);
+		}
+		return customer;
+
+	}
 	
 
 }
