@@ -39,6 +39,31 @@ public class UserController extends CommonController{
 		return userList;
 	}
 	
+	@RequestMapping(value = "/findAllCustomers", method = RequestMethod.GET)
+	public List<DAOUser> findAllCustomers(@RequestParam Integer pageNumber,@RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize)  throws Exception{
+		List<DAOUser> userList = new ArrayList<DAOUser>();
+		try {
+			Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "id"));
+			userList = usersService.findAllCustomers(pageable);
+		} catch (Exception e) {
+			throw new Exception("failed", e);
+		}
+		return userList;
+	}
+
+	
+	@RequestMapping(value = "/findAllEmployees", method = RequestMethod.GET)
+	public List<DAOUser> findAllEmployees(@RequestParam Integer pageNumber,@RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize)  throws Exception{
+		List<DAOUser> userList = new ArrayList<DAOUser>();
+		try {
+			Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "id"));
+			userList = usersService.findAllEmployees(pageable);
+		} catch (Exception e) {
+			throw new Exception("failed", e);
+		}
+		return userList;
+	}
+	
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
 	public DAOUser create(@RequestBody DAOUser user)  throws Exception{
 		try {
@@ -60,4 +85,14 @@ public class UserController extends CommonController{
 		return user;
 	}
 
+	@RequestMapping(value = "/addEmployee", method = RequestMethod.POST)
+	public DAOUser addEmployee(@RequestBody DAOUser user)  throws Exception{
+		try {
+			user = usersService.addEmployee(user);
+			return user;
+		} catch (Exception e) {
+			throw new Exception("failed", e);
+		}
+	}
+	
 }

@@ -31,11 +31,17 @@ public class DAOUser extends BaseEntity  implements Serializable {
     @JoinColumn(name = "customer_id")
 	private Customer customer;
 	
+	@ManyToOne
+    @JoinColumn(name = "employee_id")
+	private Employee employee;
+	
 	@Transient
 	private String newPassword;
 	
 	@Column(name = "userType")
 	private String userType = "CUSTOMER";	
+	
+	
 	
 	public long getId() {
 		return id;
@@ -84,4 +90,13 @@ public class DAOUser extends BaseEntity  implements Serializable {
 	public void setUserType(String userType) {
 		this.userType = userType;
 	}
+
+	public Employee getEmployee() {
+		return employee;
+	}
+
+	public void setEmployee(Employee employee) {
+		this.employee = employee;
+	}
+	
 }
