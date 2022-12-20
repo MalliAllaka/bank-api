@@ -16,12 +16,14 @@ import com.malli.dao.AccountTypeDAO;
 import com.malli.dao.ApplicationConstantsDAO;
 import com.malli.dao.CustomerDAO;
 import com.malli.dao.CustomerDetailsDAO;
+import com.malli.dao.EmployeeDAO;
 import com.malli.dao.UserDao;
 import com.malli.model.AccountType;
 import com.malli.model.ApplicationConstants;
 import com.malli.model.Customer;
 import com.malli.model.CustomerDetails;
 import com.malli.model.DAOUser;
+import com.malli.model.Employee;
 
 @Service
 public class UsersService {
@@ -43,6 +45,9 @@ public class UsersService {
 
 	@Autowired
 	private ApplicationConstantsDAO applicationConstantsDAO;
+	
+	@Autowired
+	private EmployeeDAO employeeDAO;
 	
 	public DAOUser getUserDetails(Long userId) throws Exception {
 		DAOUser user = userDao.findById(userId);
@@ -106,6 +111,49 @@ public class UsersService {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	public DAOUser addEmployee(DAOUser user) {
+		try {
+			ApplicationConstants currentEmployee =applicationConstantsDAO.findByKey("current_employee_id");
+			Integer cc = Integer.parseInt(currentEmployee.getValue())+1;
+			currentEmployee.setValue(cc.toString());
+			Employee employee = employeeDAO.save(user.getEmployee());
+			user.setUsername(employee.getFirstName().toLowerCase()+cc);
+			user.setEmployee(employee);
+			user.setPassword(bcryptEncoder.encode(user.getNewPassword()));
+			userDao.save(user);
+			
+//			applicationConstantsDAO.save(currentAccountNumber);
+//			applicationConstantsDAO.save(currentCustomer);
+
+			return user;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public List<DAOUser> findAllCustomers(Pageable pageable) throws Exception {
+		List<DAOUser> userList =new ArrayList<DAOUser>();
+		try {
+			userList = userDao.findbyCustomers(pageable);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new Exception("failed at findAll");
+		}
+		return userList;
+	}
+	
+	public List<DAOUser> findAllEmployees(Pageable pageable) throws Exception {
+		List<DAOUser> userList =new ArrayList<DAOUser>();
+		try {
+			userList = userDao.findbyEmployee(pageable);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new Exception("failed at findAll");
+		}
+		return userList;
 	}
 
 }
