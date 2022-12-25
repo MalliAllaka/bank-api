@@ -38,6 +38,9 @@ public class DAOUser extends BaseEntity  implements Serializable {
 	@Transient
 	private String newPassword;
 	
+	@Transient
+	private String currentPassword;
+	
 	@Column(name = "userType")
 	private String userType = "CUSTOMER";	
 	
@@ -97,6 +100,14 @@ public class DAOUser extends BaseEntity  implements Serializable {
 
 	public void setEmployee(Employee employee) {
 		this.employee = employee;
+	}
+
+	public String getCurrentPassword() {
+		return currentPassword;
+	}
+
+	public void setCurrentPassword(String currentPassword) {
+		this.currentPassword = currentPassword;
 	}
 	
 }
