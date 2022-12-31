@@ -10,7 +10,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.malli.dao.CustomerDAO;
+import com.malli.dao.UserDao;
 import com.malli.model.Customer;
+import com.malli.model.DAOUser;
 import com.malli.model.Transactions;
 
 @Service
@@ -18,6 +20,9 @@ public class CustomerService {
 
 	@Autowired
 	private CustomerDAO customerDAO;
+	
+	@Autowired
+	private UserDao userDao;
 
 	public List<Customer> findAll(Pageable pageable) throws Exception {
 		List<Customer> customerList = new ArrayList<Customer>();
@@ -43,10 +48,18 @@ public class CustomerService {
 	}
 
 	public Customer searchCustomer(Long id) throws Exception {
-		Optional<Customer> customerOpt = customerDAO.findById(id);
-		if (!customerOpt.isPresent()) {
+		try {
+			Optional<Customer> customerOpt = customerDAO.findById(id);
+			Customer customer =  customerOpt.get();
+			if (!customerOpt.isPresent()) {
+				throw new Exception("Customer not found for id : " + id);
+			}
+			DAOUser user = userDao.findbyCustomerId(customer.getId());
+			customer.setUser(user);
+			
+			return customer;
+		} catch (Exception e) {
 			throw new Exception("Customer not found for id : " + id);
 		}
-		return customerOpt.get();
 	} 
 }

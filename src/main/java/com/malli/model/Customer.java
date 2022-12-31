@@ -12,6 +12,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -50,6 +51,9 @@ public class Customer extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "customer_details_id")
 	private CustomerDetails customerDetails;
+    
+    @Transient
+	private DAOUser user;
     
 	public long getId() {
 		return id;
@@ -106,5 +110,12 @@ public class Customer extends BaseEntity {
 	public void setCustomerDetails(CustomerDetails customerDetails) {
 		this.customerDetails = customerDetails;
 	}
-	
+
+	public DAOUser getUser() {
+		return user;
+	}
+
+	public void setUser(DAOUser user) {
+		this.user = user;
+	}
 }
