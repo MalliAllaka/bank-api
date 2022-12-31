@@ -26,6 +26,9 @@ public interface UserDao extends JpaRepository<DAOUser, Integer> {
 
 	@Query(value = "select u from DAOUser u join u.employee e where e.firstName like %?1% or e.lastName like %?1% or e.phoneNo like %?1% ")
 	List<DAOUser> searchEmployees(String searchText, Pageable pageable);
+	
+    @Query(value = "select u from DAOUser u join u.customer c where c.id = ?1")
+	DAOUser findbyCustomerId(Long customerId);
 
 
 	

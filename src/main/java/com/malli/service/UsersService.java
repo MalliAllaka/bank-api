@@ -107,7 +107,9 @@ public class UsersService {
 			
 			customer.setCustomerDetails(customerDetails);
 			customer = customerDAO.save(user.getCustomer());
-			user.setUsername(customerDetails.getFirstName().toLowerCase()+cc);
+			String username = customerDetails.getFirstName().toLowerCase().replaceAll("\\s", "_")+"."+cc;
+//			user.setUsername(customerDetails.getFirstName().toLowerCase()+cc);
+			user.setUsername(username);
 			user.setCustomer(customer);
 			user.setPassword(bcryptEncoder.encode(user.getNewPassword()));
 			userDao.save(user);
