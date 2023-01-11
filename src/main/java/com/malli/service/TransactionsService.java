@@ -13,7 +13,9 @@ import org.springframework.stereotype.Service;
 import com.malli.common.SecurityContextUtils;
 import com.malli.dao.CustomerDAO;
 import com.malli.dao.TransactionsDAO;
+import com.malli.dao.UserDao;
 import com.malli.model.Customer;
+import com.malli.model.DAOUser;
 import com.malli.model.Transactions;
 
 @Service
@@ -24,6 +26,9 @@ public class TransactionsService {
 	
 	@Autowired
 	private CustomerDAO customerDAO;
+	
+	@Autowired
+	private UserDao userDao;
 	
 	public Transactions getTransactions(Long id) throws Exception {
 		Optional<Transactions> transactions = transactionsDAO.findById(id);
@@ -56,6 +61,8 @@ public class TransactionsService {
 				transactions = transactionsDAO.save(transactions);
 				customer.setBalance(customer.getBalance() - transactions.getAmount());
 				customer = customerDAO.save(customer);
+				DAOUser user = userDao.findbyCustomerId(customer.getId());
+				customer.setUser(user);
 				transactions.setCustomer(customer);
 				return transactions;
 			} else {
@@ -75,6 +82,8 @@ public class TransactionsService {
 			transactions = transactionsDAO.save(transactions);
 			customer.setBalance(customer.getBalance() + transactions.getAmount());
 			customer = customerDAO.save(customer);
+			DAOUser user = userDao.findbyCustomerId(customer.getId());
+			customer.setUser(user);
 			transactions.setCustomer(customer);
 			return transactions;
 		} catch (Exception e) {
