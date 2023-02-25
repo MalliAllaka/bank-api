@@ -19,5 +19,9 @@ public interface CustomerDAO extends JpaRepository<Customer, Long> {
     
     @Query(value = "select c from Customer c join c.customerDetails cd where TRIM(c.accountNumber) like %?1% or cd.firstName like %?1% or cd.phoneNo like %?1% ")
    	List<Customer> searchCustomers(String searchText, Pageable pageable);
+
+
+    @Query(value = "select c from Customer c join c.customerDetails cd where c.accountNumber=?1")
+	Customer findByAccountNumber(Integer accountNo);
 	
 }

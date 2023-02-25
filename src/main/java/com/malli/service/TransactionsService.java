@@ -102,4 +102,43 @@ public class TransactionsService {
 		}
 		return transactionList;
 	}
+
+	public Transactions transferAmount(Transactions transactions) throws Exception {
+		try {
+			Transactions transaction= new Transactions();
+			Optional<Customer> customerOpt = customerDAO.findById(transactions.getCustomer().getId());
+			Customer customer = customerOpt.get();
+			Optional<Customer> depositcustomerOpt = customerDAO.findById(transactions.getDepositCustomerId());
+			Customer depositcustomer = depositcustomerOpt.get();
+			
+			if(depositcustomer.getBalance() > transactions.getAmount()) {
+				String fullName = depositcustomer.getCustomerDetails().getFirstName() + depositcustomer.getCustomerDetails().getFirstName() != null ?  depositcustomer.getCustomerDetails().getFirstName()  : "";
+	
+				transaction.setDate(new Date());
+				transaction.setCustomer(transactions.getCustomer());
+				transaction.setAmount(transactions.getAmount());
+				transaction.setType("Deposite");
+				transaction.setMethod("Transfer");
+				transaction.setFrom(fullName);
+				transaction.setRemark(transactions.getRemark());
+	
+				transaction = transactionsDAO.save(transaction);
+				
+				depositcustomer.setBalance(depositcustomer.getBalance() - transaction.getAmount());
+				depositcustomer = customerDAO.save(customer);
+				
+				customer.setBalance(customer.getBalance() + transaction.getAmount());
+				customer = customerDAO.save(customer);
+				
+				DAOUser user = userDao.findbyCustomerId(customer.getId());
+				customer.setUser(user);
+				transaction.setCustomer(customer);
+				return transaction;
+			}
+			throw new Exception("Insufficient Funds");
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
+	}
 }

@@ -61,5 +61,16 @@ public class CustomerService {
 		} catch (Exception e) {
 			throw new Exception("Customer not found for id : " + id);
 		}
+	}
+
+	public Customer findByAccountNumber(Integer accountNo) throws Exception {
+		try {
+
+			Customer customer = customerDAO.findByAccountNumber(accountNo);
+			
+			return customer;
+		} catch (Exception e) {
+			throw new Exception("Customer not found for id : " + accountNo);
+		}
 	} 
 }

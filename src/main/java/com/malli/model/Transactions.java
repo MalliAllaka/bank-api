@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 @Entity
 @Table(name = "transactions")
@@ -45,6 +46,9 @@ public class Transactions extends BaseEntity {
 	
 	@Column(name = "remark")
 	private String remark;
+	
+	@Transient
+	private long depositCustomerId;
 
 	public long getId() {
 		return id;
@@ -108,6 +112,14 @@ public class Transactions extends BaseEntity {
 
 	public void setRemark(String remark) {
 		this.remark = remark;
+	}
+
+	public long getDepositCustomerId() {
+		return depositCustomerId;
+	}
+
+	public void setDepositCustomerId(long depositCustomerId) {
+		this.depositCustomerId = depositCustomerId;
 	}
 
 }
