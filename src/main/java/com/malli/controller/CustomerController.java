@@ -68,5 +68,18 @@ public class CustomerController extends CommonController{
 
 	}
 	
+	@RequestMapping(value = "/findByAccountNo", method = RequestMethod.GET)
+	public Customer findByUsername(@RequestParam Integer accountNo)  throws Exception{
+		Customer customer = new Customer();
+		try {
+			customer = customerService.findByAccountNumber(accountNo);
+		} catch (Exception e) {
+			throw new Exception("failed", e);
+		}
+		return customer;
+	}
+	
+	
+	
 
 }

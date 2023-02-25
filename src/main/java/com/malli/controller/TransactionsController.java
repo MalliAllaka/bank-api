@@ -87,5 +87,21 @@ public class TransactionsController extends CommonController{
 
 	}
 	
+	@RequestMapping(value = "/transferAmount", method = RequestMethod.POST)
+	public ResponseEntity<Map<String, Object>> transferAmount(@RequestBody Transactions transactions)  throws Exception{
+		Map<String, Object> response = new HashMap<>();
+		try {
+			transactions = transactionsService.transferAmount(transactions);
+			response.put("transaction", transactions);
+		} catch (Exception e) {
+			response.put("errorMessage", e.getMessage());
+			return new ResponseEntity<Map<String,Object>>(response,HttpStatus.FORBIDDEN);
+		}
+		return new ResponseEntity<Map<String,Object>>(response, HttpStatus.OK);
+
+	}
+	
+	
+	
 
 }
