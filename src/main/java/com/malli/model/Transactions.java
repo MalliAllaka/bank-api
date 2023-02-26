@@ -49,6 +49,9 @@ public class Transactions extends BaseEntity {
 	
 	@Transient
 	private long depositCustomerId;
+	
+	@Column(name = "balance")
+	private Double balance;
 
 	public long getId() {
 		return id;
@@ -120,6 +123,14 @@ public class Transactions extends BaseEntity {
 
 	public void setDepositCustomerId(long depositCustomerId) {
 		this.depositCustomerId = depositCustomerId;
+	}
+
+	public Double getBalance() {
+		return balance;
+	}
+
+	public void setBalance(Double balance) {
+		this.balance = balance;
 	}
 
 }
