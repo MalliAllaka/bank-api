@@ -1,10 +1,19 @@
 package com.malli.service;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
+import javax.persistence.TemporalType;
+
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -58,8 +67,10 @@ public class TransactionsService {
 				String userName = SecurityContextUtils.getUserId();
 				transactions.setDate(new Date());
 				transactions.setFrom(userName);
+				Double balance = customer.getBalance() - transactions.getAmount();
+				transactions.setBalance(balance);
 				transactions = transactionsDAO.save(transactions);
-				customer.setBalance(customer.getBalance() - transactions.getAmount());
+				customer.setBalance(balance);
 				customer = customerDAO.save(customer);
 				DAOUser user = userDao.findbyCustomerId(customer.getId());
 				customer.setUser(user);
@@ -79,8 +90,10 @@ public class TransactionsService {
 			Optional<Customer> customerOpt = customerDAO.findById(transactions.getCustomer().getId());
 			Customer customer = customerOpt.get();
 			transactions.setDate(new Date());
+			Double balance = customer.getBalance() + transactions.getAmount();
+			transactions.setBalance(balance);
 			transactions = transactionsDAO.save(transactions);
-			customer.setBalance(customer.getBalance() + transactions.getAmount());
+			customer.setBalance(balance);
 			customer = customerDAO.save(customer);
 			DAOUser user = userDao.findbyCustomerId(customer.getId());
 			customer.setUser(user);
@@ -92,10 +105,36 @@ public class TransactionsService {
 		}
 	}
 
-	public List<Transactions> findbyCustomerId(Long customerId, Pageable pageable) throws Exception {
+	public List<Transactions> findbyCustomerId(Long customerId, String startDate, String endDate, Pageable pageable)throws Exception {
 		List<Transactions> transactionList =new ArrayList<Transactions>();
 		try {
-			transactionList = transactionsDAO.findbyCustomerId(customerId,pageable);
+			if(!StringUtils.isNotBlank(startDate) || !StringUtils.isNotBlank(endDate)) {
+				transactionList = transactionsDAO.findbyCustomerId(customerId,pageable);
+			} else {
+				DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+				Date startDateTime = dateFormat.parse(startDate);
+				Date endDateDateTime = dateFormat.parse(endDate);
+				
+				if(startDateTime!=null){
+					Calendar cal = Calendar.getInstance();
+					cal.setTime(startDateTime);
+					cal.set(Calendar.HOUR, 0);
+					cal.set(Calendar.MINUTE, 0);
+					cal.set(Calendar.SECOND, 0);
+					cal.set(Calendar.MILLISECOND, 0);
+					startDateTime = cal.getTime();
+				}
+				if(endDateDateTime!=null){
+					Calendar cal = Calendar.getInstance();
+					cal.setTime(endDateDateTime);
+					cal.set(Calendar.HOUR, 23);
+					cal.set(Calendar.MINUTE, 59);
+					cal.set(Calendar.SECOND, 59);
+					cal.set(Calendar.MILLISECOND, 0);
+					endDateDateTime = cal.getTime();
+				}
+				transactionList = transactionsDAO.findbyCustomerId(customerId,startDateTime,endDateDateTime,pageable);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new Exception("failed at findAll");
@@ -106,6 +145,8 @@ public class TransactionsService {
 	public Transactions transferAmount(Transactions transactions) throws Exception {
 		try {
 			Transactions transaction= new Transactions();
+			Transactions depositCustomerTransaction= new Transactions();
+
 			Optional<Customer> customerOpt = customerDAO.findById(transactions.getCustomer().getId());
 			Customer customer = customerOpt.get();
 			Optional<Customer> depositcustomerOpt = customerDAO.findById(transactions.getDepositCustomerId());
@@ -121,14 +162,24 @@ public class TransactionsService {
 				transaction.setMethod("Transfer");
 				transaction.setFrom(fullName);
 				transaction.setRemark(transactions.getRemark());
-	
+				Double balance = customer.getBalance() + transactions.getAmount();
+				transaction.setBalance(balance);
 				transaction = transactionsDAO.save(transaction);
-				
-				depositcustomer.setBalance(depositcustomer.getBalance() - transaction.getAmount());
-				depositcustomer = customerDAO.save(customer);
-				
-				customer.setBalance(customer.getBalance() + transaction.getAmount());
+				customer.setBalance(balance);
 				customer = customerDAO.save(customer);
+				
+				depositCustomerTransaction.setDate(new Date());
+				depositCustomerTransaction.setCustomer(depositcustomer);
+				depositCustomerTransaction.setAmount(transactions.getAmount());
+				depositCustomerTransaction.setType("Withdraw");
+				depositCustomerTransaction.setMethod("Transfer");
+				depositCustomerTransaction.setFrom("self");
+				depositCustomerTransaction.setRemark(transactions.getRemark());
+				Double dbalance = depositcustomer.getBalance() - transactions.getAmount();
+				depositCustomerTransaction.setBalance(dbalance);
+				depositCustomerTransaction = transactionsDAO.save(depositCustomerTransaction);
+				depositcustomer.setBalance(dbalance);
+				depositcustomer = customerDAO.save(depositcustomer);
 				
 				DAOUser user = userDao.findbyCustomerId(customer.getId());
 				customer.setUser(user);
@@ -141,4 +192,6 @@ public class TransactionsService {
 			throw e;
 		}
 	}
+
+
 }
