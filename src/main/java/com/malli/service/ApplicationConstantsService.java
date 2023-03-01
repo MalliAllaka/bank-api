@@ -26,6 +26,27 @@ public class ApplicationConstantsService {
 			throw e;
 		}
 		return applicationConstants;
+	}
+
+	public ApplicationConstants findByKey(String string) {
+		ApplicationConstants applicationConstants = new ApplicationConstants();
+		try {
+			 applicationConstants  = applicationConstantsDAO.findByKey(string);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
+		return applicationConstants;
+	} 
+	
+	public ApplicationConstants update(ApplicationConstants applicationConstants) {
+		try {
+			applicationConstants  = applicationConstantsDAO.save(applicationConstants);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
+		return applicationConstants;
 	} 
 
 }

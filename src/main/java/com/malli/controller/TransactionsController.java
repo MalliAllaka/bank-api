@@ -28,8 +28,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.malli.common.CommonController;
 import com.malli.common.TransactionPDFExporter;
+import com.malli.model.ApplicationConstants;
 import com.malli.model.Customer;
 import com.malli.model.Transactions;
+import com.malli.service.ApplicationConstantsService;
 import com.malli.service.CustomerService;
 import com.malli.service.TransactionsService;
 
@@ -43,6 +45,10 @@ public class TransactionsController extends CommonController{
 	
 	@Autowired
 	private CustomerService customerService;
+	
+	@Autowired
+	private ApplicationConstantsService applicationConstantsService;
+
 	
 	@RequestMapping(value = "/findAll", method = RequestMethod.GET)
 	public List<Transactions> findAll(@RequestParam Integer pageNumber,@RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize)  throws Exception{
@@ -62,7 +68,7 @@ public class TransactionsController extends CommonController{
 	public List<Transactions> findbyCustomerId(@RequestParam Integer pageNumber,@RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize,Long customerId,String startDate,String endDate)  throws Exception{
 		List<Transactions> transactionList = new ArrayList<Transactions>();
 		try {
-			Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "id"));
+			Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "date"));
 			
 			transactionList = transactionsService.findbyCustomerId(customerId,startDate,endDate,pageable);
 		} catch (Exception e) {
@@ -77,7 +83,7 @@ public class TransactionsController extends CommonController{
 		try {
 			
 			Customer customer = customerService.searchCustomer(customerId);
-			Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "id"));
+			Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "date"));
 			
 			transactionList = transactionsService.findbyCustomerId(customerId,startDate,endDate,pageable);
 			
@@ -134,6 +140,8 @@ public class TransactionsController extends CommonController{
 	public ResponseEntity<Map<String, Object>> transferAmount(@RequestBody Transactions transactions)  throws Exception{
 		Map<String, Object> response = new HashMap<>();
 		try {
+			ApplicationConstants currentAccountNumber=applicationConstantsService.findByKey("current_transaction_id");
+
 			transactions = transactionsService.transferAmount(transactions);
 			response.put("transaction", transactions);
 		} catch (Exception e) {

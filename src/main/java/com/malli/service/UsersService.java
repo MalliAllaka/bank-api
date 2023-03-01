@@ -1,5 +1,7 @@
 package com.malli.service;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -98,7 +100,14 @@ public class UsersService {
 			currentAccountNumber.setValue(can.toString());
 			Integer cc = Integer.parseInt(currentCustomer.getValue())+1;
 			currentCustomer.setValue(cc.toString());
-			customer.setAccountNumber(can);
+			
+			DateFormat dateFormat = new SimpleDateFormat("yyyy");
+			Date date = new Date();
+			String append = dateFormat.format(date);
+			Integer cId = Integer.parseInt(append+can.toString());
+
+			
+			customer.setAccountNumber(cId);
 			customer.setCustomerId(cc.toString());
 			customer.setAccountType(accountType);
 			customer.setBalance(accountType.getMinBalance());

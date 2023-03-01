@@ -20,9 +20,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.malli.common.SecurityContextUtils;
+import com.malli.dao.ApplicationConstantsDAO;
 import com.malli.dao.CustomerDAO;
 import com.malli.dao.TransactionsDAO;
 import com.malli.dao.UserDao;
+import com.malli.model.ApplicationConstants;
 import com.malli.model.Customer;
 import com.malli.model.DAOUser;
 import com.malli.model.Transactions;
@@ -38,6 +40,9 @@ public class TransactionsService {
 	
 	@Autowired
 	private UserDao userDao;
+	
+	@Autowired
+	private ApplicationConstantsDAO applicationConstantsDAO;
 	
 	public Transactions getTransactions(Long id) throws Exception {
 		Optional<Transactions> transactions = transactionsDAO.findById(id);
@@ -64,11 +69,20 @@ public class TransactionsService {
 			Optional<Customer> customerOpt = customerDAO.findById(transactions.getCustomer().getId());
 			Customer customer = customerOpt.get();
 			if(customer.getBalance() >= transactions.getAmount()) {
+				ApplicationConstants currentTransaction=applicationConstantsDAO.findByKey("current_transaction_id");
+				Integer can = Integer.parseInt(currentTransaction.getValue());
+				can = can + 1;
+				currentTransaction.setValue(can.toString());
+				DateFormat dateFormat = new SimpleDateFormat("yyMM");
+				Date date = new Date();
+				String append = dateFormat.format(date);
+				
 				String userName = SecurityContextUtils.getUserId();
 				transactions.setDate(new Date());
 				transactions.setFrom(userName);
 				Double balance = customer.getBalance() - transactions.getAmount();
 				transactions.setBalance(balance);
+				transactions.setId(append+can);
 				transactions = transactionsDAO.save(transactions);
 				customer.setBalance(balance);
 				customer = customerDAO.save(customer);
@@ -87,10 +101,20 @@ public class TransactionsService {
 
 	public Transactions depositeAmount(Transactions transactions) throws Exception {
 		try {
+			ApplicationConstants currentTransaction=applicationConstantsDAO.findByKey("current_transaction_id");
+			Integer can = Integer.parseInt(currentTransaction.getValue());
+			can = can + 1;
+			currentTransaction.setValue(can.toString());
+			DateFormat dateFormat = new SimpleDateFormat("yyMM");
+			Date date = new Date();
+			String append = dateFormat.format(date);
+
 			Optional<Customer> customerOpt = customerDAO.findById(transactions.getCustomer().getId());
 			Customer customer = customerOpt.get();
 			transactions.setDate(new Date());
 			Double balance = customer.getBalance() + transactions.getAmount();
+			
+			transactions.setId(append+can);
 			transactions.setBalance(balance);
 			transactions = transactionsDAO.save(transactions);
 			customer.setBalance(balance);
@@ -114,6 +138,19 @@ public class TransactionsService {
 				DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 				Date startDateTime = dateFormat.parse(startDate);
 				Date endDateDateTime = dateFormat.parse(endDate);
+				
+				int result = startDateTime.compareTo(endDateDateTime);
+
+				if(result == 0) {
+//				    System.out.println("Both dates are equal");
+				} else if (result < 0) {
+//					System.out.println("Date1 is before Date2");
+				} else {
+					System.out.println("Date1 is after Date2");
+					Date newDate = dateFormat.parse(endDate);
+					endDateDateTime = startDateTime;
+					startDateTime = newDate;
+				}
 				
 				if(startDateTime!=null){
 					Calendar cal = Calendar.getInstance();
@@ -146,15 +183,22 @@ public class TransactionsService {
 		try {
 			Transactions transaction= new Transactions();
 			Transactions depositCustomerTransaction= new Transactions();
-
+			ApplicationConstants currentTransaction=applicationConstantsDAO.findByKey("current_transaction_id");
+			Integer can = Integer.parseInt(currentTransaction.getValue());
+			can = can + 2;
+			currentTransaction.setValue(can.toString());
+			DateFormat dateFormat = new SimpleDateFormat("yyMM");
+			Date date = new Date();
+			String append = dateFormat.format(date);
+			
 			Optional<Customer> customerOpt = customerDAO.findById(transactions.getCustomer().getId());
 			Customer customer = customerOpt.get();
 			Optional<Customer> depositcustomerOpt = customerDAO.findById(transactions.getDepositCustomerId());
 			Customer depositcustomer = depositcustomerOpt.get();
-			
 			if(depositcustomer.getBalance() > transactions.getAmount()) {
 				String fullName = depositcustomer.getCustomerDetails().getFirstName() + depositcustomer.getCustomerDetails().getFirstName() != null ?  depositcustomer.getCustomerDetails().getFirstName()  : "";
-	
+				Integer canT = can-1;
+				transaction.setId(append+canT);
 				transaction.setDate(new Date());
 				transaction.setCustomer(transactions.getCustomer());
 				transaction.setAmount(transactions.getAmount());
@@ -168,6 +212,7 @@ public class TransactionsService {
 				customer.setBalance(balance);
 				customer = customerDAO.save(customer);
 				
+				depositCustomerTransaction.setId(append+can);
 				depositCustomerTransaction.setDate(new Date());
 				depositCustomerTransaction.setCustomer(depositcustomer);
 				depositCustomerTransaction.setAmount(transactions.getAmount());
